@@ -1,5 +1,5 @@
 {
-    "version": "1.0",
-    "check_url": "",
-    "download_url": ""
+    "version": "1.1",
+    "check_url": "https://github.com/Sonoran-Software/sonoran_kick/blob/master/kick/version_kick.json",
+    "download_url": "https://github.com/Sonoran-Software/sonoran_kick/releases/tag/latest"
 }
