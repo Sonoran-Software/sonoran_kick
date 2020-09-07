@@ -8,7 +8,10 @@
 
 local pluginConfig = Config.GetPluginConfig("kick")
 
-registerApiType("KICK_UNIT", "emergency")
+if pluginConfig.enabled then
+
+    local PendingKicks = {}
+    registerApiType("KICK_UNIT", "emergency")
     AddEventHandler("playerDropped", function()
         local source = source
         local identifier = GetIdentifiers(source)[Config.primaryIdentifier]
@@ -16,6 +19,24 @@ registerApiType("KICK_UNIT", "emergency")
             debugLog("kick: no API ID, skip")
             return
         end
-        local data = {['apiId'] = identifier, ['reason'] = "You have Exited the server"}
-        performApiRequest({data}, 'KICK_UNIT', function() end)
+        table.insert(PendingKicks, identifier)
     end)
+
+    CreateThread(function()
+        while true do
+            if #PendingKicks > 0 then
+                local kicks = {}
+                while true do
+                    local pendingKick = table.remove(PendingKicks)
+                    if pendingKick ~= nil then
+                        table.insert(kicks, {["apiId"] = pendingKick, ["reason"] = "You have exited the server", ["serverId"] = Config.serverId})
+                    else
+                        break
+                    end
+                end
+                performApiRequest(kicks, 'KICK_UNIT', function() end)
+            end
+            Wait(10000)
+        end
+    end)
+end
