@@ -19,7 +19,18 @@ if pluginConfig.enabled then
             debugLog("kick: no API ID, skip")
             return
         end
-        table.insert(PendingKicks, identifier)
+        performApiRequest({
+            ['serverId'] = Config.serverId,
+            ['onlyUnits'] = true,
+        }, "GET_ACTIVE_UNITS", function(units)
+            if units ~= nil and #units > 0 then
+                for _, unit in pairs(units) do
+                    if unit.data.apiId1 == identifier or unit.data.apiId2 == identifier then
+                        table.insert(PendingKicks, identifier)
+                    end
+                end
+            end
+        end)
     end)
 
     CreateThread(function()
